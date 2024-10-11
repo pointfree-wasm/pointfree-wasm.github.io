@@ -1,0 +1,6 @@
+packages:
+  pointfree-wasm.cabal
+
+allow-newer:
+  , pointfree:base
+

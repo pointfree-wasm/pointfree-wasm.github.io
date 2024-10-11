@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+  <head lang="en-US" dir="ltr">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Pointfree</title>
+    <meta name="author" content="">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+  </head>
+
+  <body>
+    <script type="module">
+      globalThis.realWorker = function () {
+        return "WASM not ready yet, please try again in a few moments";
+      };
+
+      async function process() {
+        var input = document.getElementById("input");
+        var output = document.getElementById("output");
+        console.log("input = " + input.value + ", realWorker = " + globalThis.realWorker);
+        output.innerHTML = await globalThis.realWorker(input.value);
+        return true;
+      }
+
+      globalThis.process = process;
+    </script>
+
+    <script type="module">
+
+      import { WASI, OpenFile, File, ConsoleStdout } from "https://cdn.jsdelivr.net/npm/@bjorn3/browser_wasi_shim@0.2.21/dist/index.js"
+      import ghc_wasm_jsffi from "./pointfree-wasm.js";
+
+      const fds = [
+        new OpenFile(new File([])), // stdin
+        ConsoleStdout.lineBuffered((msg) => console.log(`[WASI stdout] ${msg}`)),
+        ConsoleStdout.lineBuffered((msg) => console.warn(`[WASI stderr] ${msg}`)),
+      ];
+      const options = {};
+
+      const wasi = new WASI([], [], fds, options);
+
+      var memory = new WebAssembly.Memory({ initial: 1 });
+
+      const instance_exports = {};
+
+      var importObject = {
+        wasi_snapshot_preview1: wasi.wasiImport,
+        ghc_wasm_jsffi: ghc_wasm_jsffi(instance_exports)
+      };
+
+      const { instance } = await WebAssembly.instantiateStreaming(fetch("pointfree-wasm.wasm"), importObject);
+
+      Object.assign(instance_exports, instance.exports);
+
+      wasi.initialize(instance);
+
+      globalThis.realWorker = instance.exports.pointfreeWasm;
+
+    </script>
+
+    <input id="input" type="text" value="\x y -> x + y" />
+    <button onclick="process()">
+      Convert
+    </button>
+    <code id="output" />
+
+  </body>
+</html>
