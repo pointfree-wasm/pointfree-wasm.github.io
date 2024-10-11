@@ -34,6 +34,7 @@
         padding: 0.5em;
         width: 100%;
         font-family: monospace;
+        font-size: 1rem;
         border: 0;
       }
 
@@ -52,10 +53,6 @@
         color: #d5c5ff;
       }
 
-      h1 {
-        color: #5e5184;
-      }
-
     </style>
   </head>
 
@@ -67,8 +64,8 @@
       <button id="input-process" onclick="process()">
         Convert to pointfree
       </button>
-
-      <input id="output" type="text" readonly="true" placeholder="pointfree result" spellcheck="false" />
+      <br/>
+      <textarea id="output" type="text" readonly="true" placeholder="pointfree result" spellcheck="false"></textarea>
       <br/>
       <br/>
       <p>
@@ -88,9 +85,15 @@
       };
 
       async function process() {
-        var input = document.getElementById("input");
-        var output = document.getElementById("output");
-        output.value = await globalThis.realWorker(input.value);
+        const input = document.getElementById("input");
+        const output = document.getElementById("output");
+        const result = await globalThis.realWorker(input.value);
+        if (Array.isArray(result)) {
+          output.rows  = result.length;
+          output.value = result.join("\n");
+        } else {
+          output.value = result;
+        }
         return true;
       }
 
