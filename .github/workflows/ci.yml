@@ -1,0 +1,92 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - master
+  pull_request: {} # Validate all PRs
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  wasi:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            deploy: true
+            ghc: "9.10"
+            ghc-wasm-meta-rev: a04cc1a2206d2030326e1d49be9c6a94ee4283a3
+            allow-failure: false
+          - os: ubuntu-latest
+            deploy: false
+            ghc: "9.10"
+            ghc-wasm-meta-rev: master
+            allow-failure: true
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: setup-ghc-wasm32-wasi
+      run: |
+        cd $(mktemp -d)
+        curl -L https://gitlab.haskell.org/ghc/ghc-wasm-meta/-/archive/$GHC_WASM_META_REV/ghc-wasm-meta.tar.gz | tar xz --strip-components=1
+        ./setup.sh
+        ~/.ghc-wasm/add_to_github_path.sh
+      env:
+        FLAVOUR: ${{ matrix.ghc }}
+        GHC_WASM_META_REV: ${{ matrix.ghc-wasm-meta-rev }}
+
+    - uses: haskell-actions/setup@v2
+      id: setup-haskell-cabal
+      with:
+        ghc-version: ${{ matrix.ghc }}
+
+    - name: Update cabal package database
+      run: cabal update
+
+    - name: Set PATH and environment variables
+      run: |
+        echo "$HOME/.cabal/bin" >> $GITHUB_PATH
+
+    - uses: actions/checkout@v4
+
+    - uses: actions/cache@v3
+      name: Cache WASM cabal stuff
+      with:
+        path: |
+          ~/.ghc-wasm/.cabal/store
+        key: wasi-${{ runner.os }}-${{ matrix.ghc-wasm-meta-rev }}-flavour-${{ matrix.ghc }}
+        restore-keys: |
+          wasi-${{ runner.os }}-${{ matrix.ghc-wasm-meta-rev }}-flavour-${{ matrix.ghc }}
+
+    - uses: actions/cache@v3
+      name: Cache cabal stuff
+      with:
+        path: |
+          ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
+          dist-newstyle
+        key: ${{ runner.os }}-${{ matrix.ghc }}
+
+    - name: Build dependencies
+      run: |
+        cabal install happy
+
+    - name: Build
+      run: |
+        wasm32-wasi-cabal build all --enable-tests --enable-benchmarks
+
+        mkdir gh-pages-result
+
+        cp -v index.html $(wasm32-wasi-cabal list-bin pointfree-wasm:exe:pointfree-wasm) gh-pages-result/
+
+        $(wasm32-wasi-ghc --print-libdir)/post-link.mjs -i $(wasm32-wasi-cabal list-bin pointfree-wasm:exe:pointfree-wasm) -o gh-pages-result/pointfree-wasm.js
+
+    - name: Deploy on Github Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: ${{ matrix.deploy && (github.ref == 'refs/heads/main') }}
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./gh-pages-result

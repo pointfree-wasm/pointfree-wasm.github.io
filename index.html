@@ -103,7 +103,7 @@
     <script type="module">
 
       import { WASI, OpenFile, File, ConsoleStdout } from "https://cdn.jsdelivr.net/npm/@bjorn3/browser_wasi_shim@0.2.21/dist/index.js"
-      import ghc_wasm_jsffi from "./pointfree-wasm.js";
+      import ghc_wasm_jsffi from "pointfree-wasm.js";
 
       const fds = [
         new OpenFile(new File([])), // stdin
