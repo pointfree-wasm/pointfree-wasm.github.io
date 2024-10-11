@@ -14,8 +14,8 @@ copyright:
   (c) Sergey Vinokurov 2024
 license:
   Apache-2.0
--- license-file:
---   LICENSE
+license-file:
+  LICENSE
 author:
   Sergey Vinokurov
 maintainer:
@@ -23,10 +23,6 @@ maintainer:
 
 build-type:
   Simple
-
-extra-source-files:
-  Changelog.md
-  Readme.md
 
 homepage:
   https://github.com/sergv/pointfree-wasm
