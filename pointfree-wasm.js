@@ -82,7 +82,7 @@ if (globalThis.setImmediate) {
 } else {
   try {
     // deno
-    setImmediate = (await import("node:timers")).setImmediate;
+    throw new Error("node not supported");
   } catch {
     // browsers
     const sm = new SetImmediate();

@@ -12,10 +12,11 @@
         padding: 0;
         margin: 0;
         font-family: sans-serif;
+        border-radius: 0;
       }
 
       body {
-        padding-top: 2em;
+        padding-top: 2rem;
 
         display: flex;
         flex-direction: column;
@@ -30,19 +31,21 @@
       }
 
       #input, #output {
-        margin-top: 1em;
-        padding: 0.5em;
-        width: 100%;
+        margin-top: 1rem;
+        padding: 0.5rem;
+        width: min(80vw, 35rem);
         font-family: monospace;
         font-size: 1rem;
         border: 0;
       }
 
       #input-process {
-        margin-top: 0.8333333333333333em;
-        padding: 0.4166666666666667em;
+        margin-top: 1rem;
+        padding: 0.5rem;
         font-family: sans-serif;
         font-size: 120%;
+        color: #000;
+        border-radius: 0;
       }
 
       a {
@@ -53,19 +56,38 @@
         color: #d5c5ff;
       }
 
+      @media (pointer:coarse) {
+
+        h1 {
+          font-size: 300%;
+        }
+
+        #input, #output {
+          width: min(100vw, 80rem);
+          font-size: 200%;
+          padding: 2rem 1.5rem;
+        }
+
+        #input-process {
+          font-size: 200%;
+          padding: 2rem;
+        }
+
+      }
+
     </style>
   </head>
 
   <body>
     <main>
-      <h1 class="title">Pointfree.wasm</h1>
+      <h1>Pointfree.wasm</h1>
       <input id="input" type="text" autofocus="true" value="\xs ys -> sum (zipWith (*) xs ys)" spellcheck="false" />
       <br/>
       <button id="input-process" onclick="process()">
         Convert to pointfree
       </button>
       <br/>
-      <textarea id="output" type="text" readonly="true" placeholder="pointfree result" spellcheck="false"></textarea>
+      <textarea id="output" type="text" readonly="true" placeholder="pointfree result" spellcheck="false" rows="1"></textarea>
       <br/>
       <br/>
       <p>
