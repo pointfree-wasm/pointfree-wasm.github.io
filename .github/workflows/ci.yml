@@ -1,5 +1,8 @@
 name: ci
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
@@ -86,7 +89,7 @@ jobs:
 
     - name: Deploy on Github Pages
       uses: peaceiris/actions-gh-pages@v3
-      if: ${{ matrix.deploy && (github.ref == 'refs/heads/main') }}
+      if: ${{ matrix.deploy && (github.ref == 'refs/heads/master') }}
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./gh-pages-result
