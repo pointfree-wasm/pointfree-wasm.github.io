@@ -87,6 +87,9 @@ jobs:
 
         $(wasm32-wasi-ghc --print-libdir)/post-link.mjs -i $(wasm32-wasi-cabal list-bin pointfree-wasm:exe:pointfree-wasm) -o gh-pages-result/pointfree-wasm.js
 
+        # Remove import that Safari doesn’t like.
+        sed -i -re 's/^([ \t]*).*import\("node:timers"\).*$/\1throw new Error("node not supported");/' gh-pages-result/pointfree-wasm.js
+
     - name: Deploy on Github Pages
       uses: peaceiris/actions-gh-pages@v3
       if: ${{ matrix.deploy && (github.ref == 'refs/heads/master') }}
