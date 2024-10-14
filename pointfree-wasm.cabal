@@ -7,9 +7,7 @@ name:
 version:
   0.1
 synopsis:
-  TODO
-description:
-  TODO
+  WASM application to transform Haskell expressions to pointfree
 copyright:
   (c) Sergey Vinokurov 2024
 license:
@@ -53,10 +51,6 @@ common ghc-options
     ghc-options:
       -Wno-missing-deriving-strategies
 
-  -- if impl(ghc >= 8.10)
-  --   ghc-options:
-  --     -Wno-prepositive-qualified-module
-
   if impl(ghc >= 9.2)
     ghc-options:
       -Wno-missing-kind-signatures
@@ -66,21 +60,8 @@ common ghc-options
       -Wno-missing-role-annotations
       -Wno-missing-poly-kind-signatures
 
--- library
---   import: ghc-options
---   exposed-modules:
---     Pointfree.Wasm
---   hs-source-dirs:
---     src
---   build-depends:
---     , base >= 4.16
---     , ghc-experimental
---     , pointfree
-
 executable pointfree-wasm
   import: ghc-options
-  -- main-is:
-  --   exe/PointfreeWasm.hs
   main-is:
     src/Pointfree/Wasm.hs
   c-sources:
@@ -91,9 +72,6 @@ executable pointfree-wasm
     , pointfree
   ghc-options:
     -rtsopts
-    -- -threaded
-    -- "-with-rtsopts=-N -A32M"
-    -- -main-is PointfreeWasm
     -no-hs-main
     -optl-mexec-model=reactor
     "-optl-Wl,--export=pointfreeWasm"
