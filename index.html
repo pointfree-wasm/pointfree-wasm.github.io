@@ -102,6 +102,9 @@
       <p>
         This project is made possible thanks to the <a href="https://hackage.haskell.org/package/pointfree">pointfree</a> package and all the contributions to the WASM support in GHC.
       </p>
+      <p>
+        Github repository is at <a href="https://github.com/pointfree-wasm/pointfree-wasm.github.io">https://github.com/pointfree-wasm/pointfree-wasm.github.io</a>.
+      </p>
     </main>
 
     <script type="module">
@@ -114,8 +117,13 @@
         const output = document.getElementById("output");
         const result = await globalThis.realWorker(input.value);
         if (Array.isArray(result)) {
-          output.rows  = result.length;
-          output.value = result.join("\n");
+          if (result.length == 0) {
+            output.rows  = 2;
+            output.value = "No results, most likely the input expression is malformed but specific problem cannot be shown by this application.\nPlease double check the input or try feeding it to a Haskell REPL, e.g. GHCi, to find out the specific problem.";
+          } else {
+            output.rows  = result.length;
+            output.value = result.join("\n");
+          }
         } else {
           output.value = result;
         }
