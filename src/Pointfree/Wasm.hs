@@ -36,9 +36,3 @@ pointfreeWasm input = do
   for_ results $ \res ->
     pushArr arr $ toJSString res
   pure arr
-
-_fromJSString' :: JSString -> String
-_fromJSString' = fromJSString
-
-_toJSString' :: String -> JSString
-_toJSString' = toJSString
