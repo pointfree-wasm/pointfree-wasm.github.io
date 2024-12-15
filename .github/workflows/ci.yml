@@ -56,7 +56,7 @@ jobs:
 
     - uses: actions/checkout@v4
 
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       name: Cache WASM cabal stuff
       with:
         path: |
@@ -65,13 +65,12 @@ jobs:
         restore-keys: |
           wasi-${{ runner.os }}-${{ matrix.ghc-wasm-meta-rev }}-flavour-${{ matrix.ghc }}
 
-    - uses: actions/cache@v3
-      name: Cache cabal stuff
+    - uses: actions/cache@v4
+      name: Cache cabal store
       with:
-        path: |
-          ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
-          dist-newstyle
-        key: ${{ runner.os }}-${{ matrix.ghc }}
+        path: ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
+        key: ${{ runner.os }}-${{ matrix.ghc }}-${{ github.sha }}
+        restore-keys: ${{ runner.os }}-${{ matrix.ghc }}-
 
     - name: Build dependencies
       run: |
